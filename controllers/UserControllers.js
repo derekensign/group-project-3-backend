@@ -116,13 +116,9 @@ userControllers.verify = async (req, res) => {
 
 userControllers.addToCart = async (req, res) => {
     try {
-        const user = await models.user.findOne({
-            where: { id: req.headers.authorization}
-        })
-        if (user===null) {
-            req.status(404).json({ message: 'user cannot be found'})
-            return
-        }
+        let encryptedId = req.headers.authorization
+
+        const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
         
         const product = await models.product.findOne({
             where: {
@@ -132,7 +128,7 @@ userControllers.addToCart = async (req, res) => {
 
         const cartItem = await models.cart.create({
             productId: product.id,
-            userId: user.id
+            userId: decryptedId.userId 
         })
         res.json({cartItem, message: 'product added to cart'})
 
