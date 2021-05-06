@@ -114,4 +114,46 @@ userControllers.verify = async (req, res) => {
 }
 
 
+userControllers.addToCart = async (req, res) => {
+    try {
+        const user = await models.user.findOne({
+            where: { id: req.headers.authorization}
+        })
+        if (user===null) {
+            req.status(404).json({ message: 'user cannot be found'})
+            return
+        }
+        
+        const product = await models.product.findOne({
+            where: {
+                id: req.params.productId
+            }
+        })
+
+        const cartItem = await models.cart.create({
+            productId: product.id,
+            userId: user.id
+        })
+        res.json({cartItem, message: 'product added to cart'})
+
+    } catch (error) {
+        res.json({error})
+    }
+}
+
+// imageController.allFavs = async (req, res) => {
+//     try {
+//         const user = await models.user.findOne({
+//             where: {
+//                 id: req.headers.authorization
+//             }
+//         })
+
+//         const favImages = await user.getImages() 
+//         res.json({ favImages })
+//     } catch (error) {
+//         res.status(400).json({ error: error.message })
+//     }
+// }
+
 module.exports = userControllers
