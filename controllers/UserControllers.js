@@ -1,4 +1,5 @@
 const models = require('../models')
+const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 const userControllers = {}
@@ -12,10 +13,21 @@ userControllers.create = async (req, res) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: hashedPassword
-
         })
 
-        res.json({ user })
+        const encryptedId = jwt.sign({userId: user.id}, process.env.JWT_SECRET)
+
+        const userObj = {
+            id: encryptedId,
+            firstName: user.dataValues.firstName,
+            lastName: user.dataValues.lastName,
+            email: user.dataValues.email,
+            password: user.dataValues.password
+        }
+
+        res.json({
+            user: userObj
+        })
 
     }catch (error) {
         console.log(error);
@@ -30,9 +42,24 @@ userControllers.login = async (req, res) => {
                 email: req.body.email,
             }
         })
+
+        const encryptedId = jwt.sign({userId: user.id}, process.env.JWT_SECRET)
+
         const validPassword = await bcrypt.compare(req.body.password, user.password)
+
+        const userObj = {
+            id: encryptedId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: user.password
+        }
+
         if (validPassword) {
-            res.json({user, message: 'login successful'})
+            res.json({
+                user: userObj,
+                message: 'login successful'
+            })
         }else {
             res.status(400).json({ message: 'login failed' })
         }
@@ -40,6 +67,49 @@ userControllers.login = async (req, res) => {
     }catch (error) {
         console.log(error);
         res.status(400).json({error: error.message})
+    }
+}
+
+userControllers.verify = async (req, res) => {
+    try {
+        let encryptedId = req.headers.authorization
+        // console.log('encryptedId', encryptedId);
+        const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
+
+        const user = await models.user.findOne({
+            where: {
+                id: decryptedId.userId
+            }
+        })
+
+        encryptedId = jwt.sign({userId: user.id}, process.env.JWT_SECRET)
+        // console.log(user, encryptedId);
+
+        const userObj = {
+            id: encryptedId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: user.password
+        }
+
+        if (user) {
+            res.json({
+                message: 'Verified user',
+                user: userObj
+            })
+        } else {
+            res.json({
+                status: 404,
+                message: 'No user logged in'
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            message: 'Error in /users/verify',
+            error
+        })
     }
 }
 
