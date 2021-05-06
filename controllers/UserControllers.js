@@ -137,6 +137,30 @@ userControllers.addToCart = async (req, res) => {
     }
 }
 
+userControllers.getCart = async (req, res) => {
+    try {
+        const user = await models.user.findOne({
+            where: {
+                id: req.headers.authorization
+            }
+        })
+
+        const cart = await models.cart.findAll({
+            where: {
+                userId: user.id
+            },
+            include: models.product
+        })
+
+
+        res.json({ cart, message: 'cart contents'})
+
+    }catch (error) {
+        console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+}
+
 // imageController.allFavs = async (req, res) => {
 //     try {
 //         const user = await models.user.findOne({
