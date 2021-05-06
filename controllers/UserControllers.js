@@ -139,21 +139,31 @@ userControllers.addToCart = async (req, res) => {
 
 userControllers.getCart = async (req, res) => {
     try {
-        const user = await models.user.findOne({
-            where: {
-                id: req.headers.authorization
-            }
-        })
+        let encryptedId = req.headers.authorization
+        console.log('encryptedId', encryptedId)
+
+        const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
+
+        // const user = await models.user.findOne({
+        //     where: {
+        //         id: decryptedId.userId
+        //     }
+        // })
+        // console.log('foundUser', user);
 
         const cart = await models.cart.findAll({
             where: {
-                userId: user.id
+                userId: decryptedId.userId
             },
             include: models.product
         })
+        console.log('foundCart', cart)
+        const products = []
+        cart.forEach(obj => {
+            products.push(obj.product)
+        })
 
-
-        res.json({ cart, message: 'cart contents'})
+        res.json({ products, message: 'cart contents'})
 
     }catch (error) {
         console.log(error);
