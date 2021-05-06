@@ -148,7 +148,8 @@ userControllers.getCart = async (req, res) => {
         const cart = await models.cart.findAll({
             where: {
                 userId: user.id
-            }
+            },
+            include: models.product
         })
 
 
