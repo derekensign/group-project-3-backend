@@ -137,6 +137,21 @@ userControllers.addToCart = async (req, res) => {
     }
 }
 
+userControllers.removeFromCart = async (req, res) => {
+    try {
+        const deletedItem = await models.cart.destroy({
+            where: {
+                id: req.params.cartId
+            }
+        })
+
+        res.json({deletedItem, message: 'product removed from cart'})
+
+    } catch (error) {
+        res.json({error})
+    }
+}
+
 userControllers.getCart = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
