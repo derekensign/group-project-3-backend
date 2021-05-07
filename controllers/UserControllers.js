@@ -141,7 +141,7 @@ userControllers.removeFromCart = async (req, res) => {
     try {
         const deletedItem = await models.cart.destroy({
             where: {
-                id: req.params.cartId
+                createdAt: req.params.cartId
             }
         })
 
@@ -175,7 +175,9 @@ userControllers.getCart = async (req, res) => {
         console.log('foundCart', cart)
         const products = []
         cart.forEach(obj => {
-            products.push(obj.product)
+
+            products.push({...obj.product.dataValues, cartId: obj.createdAt})
+            console.log(products)
         })
 
         res.json({ products, message: 'cart contents'})
