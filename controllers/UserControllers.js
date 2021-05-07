@@ -137,6 +137,21 @@ userControllers.addToCart = async (req, res) => {
     }
 }
 
+userControllers.removeFromCart = async (req, res) => {
+    try {
+        const deletedItem = await models.cart.destroy({
+            where: {
+                createdAt: req.params.cartId
+            }
+        })
+
+        res.json({deletedItem, message: 'product removed from cart'})
+
+    } catch (error) {
+        res.json({error})
+    }
+}
+
 userControllers.getCart = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
@@ -160,7 +175,9 @@ userControllers.getCart = async (req, res) => {
         console.log('foundCart', cart)
         const products = []
         cart.forEach(obj => {
-            products.push(obj.product)
+
+            products.push({...obj.product.dataValues, cartId: obj.createdAt})
+            console.log(products)
         })
 
         res.json({ products, message: 'cart contents'})
