@@ -39,7 +39,6 @@ app.post('/create-checkout-session', async (req, res) => {
       quantity: 1
     }
   ))
-  console.log("line_items", line_items[0].price_data.product_data);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
