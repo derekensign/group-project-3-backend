@@ -26,21 +26,24 @@ app.use(express.static('.'));
 const YOUR_DOMAIN = 'http://localhost:3000';
 
 app.post('/create-checkout-session', async (req, res) => {
+  const cart = req.body.cart
+  const line_items = cart.map(item => (
+    {
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name
+        },
+        unit_amount: parseFloat(item.price) * 100 // "9.99" => 999
+      },
+      quantity: 1
+    }
+  ))
+  console.log("line_items", line_items[0].price_data.product_data);
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Stubborn Attachments',
-            images: ['https://i.imgur.com/EHyR2nP.png'],
-          },
-          unit_amount: 2000,
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: line_items,
     mode: 'payment',
     success_url: `${YOUR_DOMAIN}?success=true`,
     cancel_url: `${YOUR_DOMAIN}?canceled=true`,
