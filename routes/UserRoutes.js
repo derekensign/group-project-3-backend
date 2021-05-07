@@ -7,6 +7,7 @@ userRoutes.post('/login', userControllers.login)
 userRoutes.post('/cart/:productId', userControllers.addToCart)
 userRoutes.get('/verify', userControllers.verify)
 userRoutes.get('/cart', userControllers.getCart)
+userRoutes.get('/orders', userControllers.getOrders)
 userRoutes.delete('/cart/:cartId', userControllers.removeFromCart)
 
 module.exports = userRoutes

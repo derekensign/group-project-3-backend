@@ -1,6 +1,7 @@
 const models = require('../models')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const stripe = require('stripe')('sk_test_51IoVLqKFmp10dkyr3aVLdxWbdGSy7Z0TDmIAoKU67jHYkXdE2fqXLjA7295at1Pa6v6UjuVGJFZsjTNxauYc82vM00UHKLL30A');
 
 const userControllers = {}
 
@@ -159,13 +160,6 @@ userControllers.getCart = async (req, res) => {
 
         const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
 
-        // const user = await models.user.findOne({
-        //     where: {
-        //         id: decryptedId.userId
-        //     }
-        // })
-        // console.log('foundUser', user);
-
         const cart = await models.cart.findAll({
             where: {
                 userId: decryptedId.userId
@@ -188,19 +182,16 @@ userControllers.getCart = async (req, res) => {
     }
 }
 
-// imageController.allFavs = async (req, res) => {
-//     try {
-//         const user = await models.user.findOne({
-//             where: {
-//                 id: req.headers.authorization
-//             }
-//         })
+userControllers.getOrders = async (req, res) => {
+    try {
+        const orders = await stripe.orders.list({limit: 100,})
+        console.log(orders);
 
-//         const favImages = await user.getImages() 
-//         res.json({ favImages })
-//     } catch (error) {
-//         res.status(400).json({ error: error.message })
-//     }
-// }
+        res.json({orders})
+
+    }catch(error) {
+        console.log(error);
+    }
+}
 
 module.exports = userControllers
