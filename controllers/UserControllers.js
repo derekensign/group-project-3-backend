@@ -166,12 +166,11 @@ userControllers.getCart = async (req, res) => {
             },
             include: models.product
         })
-        console.log('foundCart', cart)
+        // console.log('foundCart', cart)
         const products = []
         cart.forEach(obj => {
-
             products.push({...obj.product.dataValues, cartId: obj.createdAt})
-            console.log(products)
+            // console.log(products)
         })
 
         res.json({ products, message: 'cart contents'})
@@ -182,15 +181,59 @@ userControllers.getCart = async (req, res) => {
     }
 }
 
+userControllers.createOrder = async (req, res) => {
+    try {
+        const cartArr = req.body.cart
+        console.log('cartArr', cartArr);
+        let encryptedId = req.headers.authorization
+        console.log('encryptedId', encryptedId)
+
+        const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
+
+        const newOrder = await models.order.create({
+            userId: decryptedId.userId,
+            order: cartArr
+        })
+        console.log('newOrder', newOrder);
+        res.status(200).json({
+            message: 'Order created',
+            order: newOrder
+        })
+        
+    } catch (error) {
+        res.json({
+            status: 400,
+            message: 'Could not create new order',
+            error
+        })
+    }
+}
+
 userControllers.getOrders = async (req, res) => {
     try {
-        const orders = await stripe.orders.list({limit: 100,})
+        let encryptedId = req.headers.authorization
+        console.log('encryptedId', encryptedId)
+
+        const decryptedId = await jwt.verify(encryptedId, process.env.JWT_SECRET)
+
+        const orders = await models.order.findAll({
+            where: {
+                userId: decryptedId.userId
+            }
+        })
         console.log(orders);
 
-        res.json({orders})
+        res.status(200).json({
+            message: 'Here are the users orders',
+            orders
+        })
 
     }catch(error) {
-        console.log(error);
+        console.log(error)
+        res.status(400).json({
+            message: 'Could not find users orders',
+            error
+        })
     }
 }
 
