@@ -8,17 +8,18 @@ const routesReport = require('rowdy-logger').begin(app)
 app.use(express.json())
 app.use(require('cors')())
 
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`server listening on ${PORT}`);
+  routesReport.print()
+})
+
 const userRoutes = require('./routes/userRoutes')
 app.use('/users', userRoutes)
 
 const productRoutes = require('./routes/productRoutes')
 app.use('/products', productRoutes)
 
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-  console.log(`server listening on ${PORT}`);
-  routesReport.print()
-})
 
 const stripe = require('stripe')('sk_test_51IoVLqKFmp10dkyr3aVLdxWbdGSy7Z0TDmIAoKU67jHYkXdE2fqXLjA7295at1Pa6v6UjuVGJFZsjTNxauYc82vM00UHKLL30A');
 app.use(express.static('.'));
