@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const stripe = require('stripe')('sk_test_51IoVLqKFmp10dkyr3aVLdxWbdGSy7Z0TDmIAoKU67jHYkXdE2fqXLjA7295at1Pa6v6UjuVGJFZsjTNxauYc82vM00UHKLL30A');
 
-const userControllers = {}
+const UserControllers = {}
 
-userControllers.create = async (req, res) => {
+UserControllers.create = async (req, res) => {
     try {
         const salt = bcrypt.genSaltSync(10)
         const hashedPassword = await bcrypt.hashSync(req.body.password, salt)
@@ -36,7 +36,7 @@ userControllers.create = async (req, res) => {
     }
 }
 
-userControllers.login = async (req, res) => {
+UserControllers.login = async (req, res) => {
     try {
         const user = await models.user.findOne({
             where: {
@@ -71,7 +71,7 @@ userControllers.login = async (req, res) => {
     }
 }
 
-userControllers.verify = async (req, res) => {
+UserControllers.verify = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
         // console.log('encryptedId', encryptedId);
@@ -115,7 +115,7 @@ userControllers.verify = async (req, res) => {
 }
 
 
-userControllers.addToCart = async (req, res) => {
+UserControllers.addToCart = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
 
@@ -138,7 +138,7 @@ userControllers.addToCart = async (req, res) => {
     }
 }
 
-userControllers.removeFromCart = async (req, res) => {
+UserControllers.removeFromCart = async (req, res) => {
     try {
         const deletedItem = await models.cart.destroy({
             where: {
@@ -153,7 +153,7 @@ userControllers.removeFromCart = async (req, res) => {
     }
 }
 
-userControllers.getCart = async (req, res) => {
+UserControllers.getCart = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
         console.log('encryptedId', encryptedId)
@@ -181,7 +181,7 @@ userControllers.getCart = async (req, res) => {
     }
 }
 
-userControllers.createOrder = async (req, res) => {
+UserControllers.createOrder = async (req, res) => {
     try {
         const cartArr = req.body.cart
         console.log('cartArr', cartArr);
@@ -209,7 +209,7 @@ userControllers.createOrder = async (req, res) => {
     }
 }
 
-userControllers.getOrders = async (req, res) => {
+UserControllers.getOrders = async (req, res) => {
     try {
         let encryptedId = req.headers.authorization
         console.log('encryptedId', encryptedId)
@@ -237,4 +237,4 @@ userControllers.getOrders = async (req, res) => {
     }
 }
 
-module.exports = userControllers
+module.exports = UserControllers
