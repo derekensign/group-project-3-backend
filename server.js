@@ -8,8 +8,8 @@ const routesReport = require('rowdy-logger').begin(app)
 app.use(express.json())
 app.use(require('cors')())
 
-const userRoutes = require('./routes/userRoutes')
-app.use('/users', userRoutes)
+const UserRoutes = require('./routes/UserRoutes')
+app.use('/users', UserRoutes)
 
 const productRoutes = require('./routes/productRoutes')
 app.use('/products', productRoutes)
